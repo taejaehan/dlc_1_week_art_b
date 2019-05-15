@@ -1,8 +1,7 @@
 
-var MIN_DISTANCE = 0.005;
+var MIN_DISTANCE = 0.05;
 var DATA_PATH = './data/';
 
-var imagesVec = [];
 var selectedVecIdx = [];
 var imagesData = [];
 
@@ -20,15 +19,11 @@ function fetchJSONFile(path, callback) {
     httpRequest.send();
 }
 
-
 fetchJSONFile(DATA_PATH+'json/data.json', function(data){
-    // do something with your data
     console.log(data);
     getImages(data.images);
 
-
     $('#masonry_con').imagesLoaded( {
-      // options...
       },
       function() {
         makeMasonry();
@@ -42,8 +37,6 @@ function getImages(images) {
     var html = "";
     for (var i = 0; i < images.length; i++) {
         html += '<div class="grid-item"><img src="'+DATA_PATH+'crop/' + images[i].name + '" index="'+i+'"><p>'+images[i].name+'</p></div>';
-        var vec = new Victor(images[i].x, images[i].y);
-        imagesVec.push(vec);
     }
     var str = $(html);
     $('.grid').append(str);
@@ -84,14 +77,15 @@ function calulateSimilarity(){
 
     var items = $('.grid-item img');
 
-    var first = imagesVec[selectedVecIdx[0]];
-    var last = imagesVec[selectedVecIdx[1]];
+    var first = new Victor(imagesData[selectedVecIdx[0]].x, imagesData[selectedVecIdx[0]].y);
+    var last =  new Victor(imagesData[selectedVecIdx[1]].x, imagesData[selectedVecIdx[1]].y);
     console.log('first :' + imagesData[selectedVecIdx[0]].name );
     console.log('last :' + imagesData[selectedVecIdx[1]].name );
-    for(var i=0; i < imagesVec.length; i++){
+
+    for(var i=0; i < imagesData.length; i++){
         console.log('imagesData[i].name : ' + imagesData[i].name)
         if(selectedVecIdx[0] != i && selectedVecIdx[1] != i){
-            var distance = getDistance(imagesVec[i], first, last);
+            var distance = getDistance(new Victor(imagesData[i].x, imagesData[i].y), first, last);
             console.log(distance);
             if(distance < MIN_DISTANCE){
                 $('#preview_list li.start').after('<li class="mid" ><img src="'+items.eq(i).attr('src')+'"></li>')
