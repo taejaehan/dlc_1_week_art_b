@@ -1,5 +1,6 @@
 
 var MIN_DISTANCE = 0.005;
+var DATA_PATH = './data/';
 
 var imagesVec = [];
 var selectedVecIdx = [];
@@ -20,7 +21,7 @@ function fetchJSONFile(path, callback) {
 }
 
 
-fetchJSONFile('./data/json/data.json', function(data){
+fetchJSONFile(DATA_PATH+'json/data.json', function(data){
     // do something with your data
     console.log(data);
     getImages(data.images);
@@ -40,7 +41,7 @@ function getImages(images) {
     imagesData = images;
     var html = "";
     for (var i = 0; i < images.length; i++) {
-        html += '<div class="grid-item"><img src="../data/saved/' + images[i].name + '" index="'+i+'"><p>'+images[i].name+'</p></div>';
+        html += '<div class="grid-item"><img src="'+DATA_PATH+'crop/' + images[i].name + '" index="'+i+'"><p>'+images[i].name+'</p></div>';
         var vec = new Victor(images[i].x, images[i].y);
         imagesVec.push(vec);
     }
