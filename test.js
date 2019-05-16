@@ -1,6 +1,6 @@
 
 var MIN_DISTANCE = 0.05;
-var DATA_PATH = './data2/';
+
 
 var MAX_SHOW_MID = 7;
 var selectedVecIdx = [];
