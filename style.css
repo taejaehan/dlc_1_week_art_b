@@ -1,9 +1,18 @@
+#loading{
+    text-align:center;
+}
 #preview_warp{
     height: 500px;
-    position: relative;
+    width: 100%;
+    position: fixed;
+    top:0;
+    left:0;
+    background-color:#fff;
+    z-index:1;
 }
 
 #masonry_con{
+    margin-top: 500px;
 }
 
 #preview_list{

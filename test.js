@@ -1,10 +1,13 @@
 
 var MIN_DISTANCE = 0.05;
-var DATA_PATH = './data/';
+var DATA_PATH = './data2/';
 
+var MAX_SHOW_MID = 7;
 var selectedVecIdx = [];
 var imagesData = [];
+var midImgs = []
 
+//$('#loading').hide();
 function fetchJSONFile(path, callback) {
     var httpRequest = new XMLHttpRequest();
     httpRequest.onreadystatechange = function() {
@@ -61,6 +64,8 @@ function makeMasonry(){
                 $('#preview_list ul').append('<li class="start" ><img src="'+$(this).children('img').attr('src')+'"></li>');
                 selectedVecIdx.push(parseInt($(this).children('img').attr('index')));
             }else{
+                $('#loading').show();
+
                 $('#preview_list ul').append('<li class="end" ><img src="'+$(this).children('img').attr('src')+'"></li>');
                 $('#preview_list').removeClass('ready');
                 $('#preview_list').addClass('ongoing');
@@ -88,20 +93,47 @@ function calulateSimilarity(){
             var distance = getDistance(new Victor(imagesData[i].x, imagesData[i].y), first, last);
             console.log(distance);
             if(distance < MIN_DISTANCE){
-                $('#preview_list li.start').after('<li class="mid" ><img src="'+items.eq(i).attr('src')+'"></li>')
+                midImgs.push({
+                    name : imagesData[i].name,
+                    src : items.eq(i).attr('src'),
+                    a_to_p : first.distance(new Victor(imagesData[i].x, imagesData[i].y))
+                })
+
             }
         }
     }
+    midImgs.sort(function(first, second) {
+        return first.a_to_p -  second.a_to_p;
+    });
+    var midLength = midImgs.length;
+    var cut = parseInt(midLength / MAX_SHOW_MID) + 1;
+
+    console.log('cut :  ' + cut);
+    for(var i=0; i < midLength; i=i+cut){
+        console.log(i);
+        $('#preview_list li.start').after('<li class="mid" ><img src="'+midImgs[i]['src']+'"></li>')
+    }
+    console.log(midImgs);
     console.log('==============================================');
     $('#preview_list').removeClass('ongoing');
     $('#preview_list').addClass('ready');
     selectedVecIdx = [];
+    midImgs = [];
+    $('#loading').hide();
 }
 
 var dd = getDistance(new Victor(3,5), new Victor(0,0), new Victor(6,1))
 console.log('dd : ' + dd);
 
+function getDistanceAtoP(a, p){
+
+}
 function getDistance(p, a, b){
+    var isOuterP = isOuterPoint(p.clone(), a.clone(), b.clone());
+//    isOuterP = false;
+    if(isOuterP){
+        return 1;
+    }
     var normalPoint = getNormalPoint(p.clone(), a.clone(), b.clone());
 //    console.log(normalPoint);
     var distance = normalPoint.distance(p);
@@ -119,3 +151,41 @@ function getNormalPoint(p, a, b){
 
     return normalPoint;
 }
+
+
+function isOuterPoint(p, a, b){
+
+    console.log('p : ' + p);
+    console.log('a : ' + a);
+    console.log('b : ' + b);
+    var ab = b.clone().subtract(a.clone());
+    console.log('ab : ' + ab);
+
+    ab.normalize();
+    console.log('ab : ' + ab);
+
+    var radius = Math.abs(b.distance(a) / 2);
+    var radiusScalar = new Victor (radius, radius);
+
+    console.log('radius : ' + radius);
+    console.log('radiusScalar : ' + radiusScalar);
+
+    ab.multiply(radiusScalar);
+    ab.add(a)
+
+    var pointToCenter = Math.abs(ab.distance(p));
+    var aToCenter = Math.abs(ab.distance(a));
+    console.log('a : ' + a);
+    console.log('b : ' + b);
+    console.log('pointToCenter : ' + pointToCenter);
+    console.log('aToCenter : ' + aToCenter);
+    if(pointToCenter >= aToCenter){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+//var cc = isOuterPoint(new Victor(0,0).clone(), new Victor(3,0).clone(), new Victor(0,4).clone());
+//console.log('cc : ' + cc);
